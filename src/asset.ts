@@ -1,0 +1,349 @@
+import { Log } from "./log";
+import { queryBalance } from "../lib/balance";
+import { itoa64 } from "util/number";
+import { PermissionLevel } from "./permission-level";
+import { NAME } from "./account";
+import { Action, ACTION, TransferParams } from "./action";
+import { NameEx } from "../lib/name_ex";
+
+/**
+ * ASCII code of character A.
+ */
+const CHAR_A: u8 = 0x41;
+/**
+ * ASCII code of character Z.
+ */
+const CHAR_Z: u8 = 0x5A;
+
+/**
+ * Encode a string to uint64 value,
+ * for example,
+ *    let symbol = StringToSymbol(4, "ABC"); // symbol = 0x43424104
+ * the precision number 4 means there are 4 digitals after ".",
+ * Asset "100.0000 ABC" will match this symbol.
+ *
+ * @param precision symbol precision
+ * @param str symbol as string
+ * @returns uint64 value.
+ *
+ * @function StringToSymbol
+ *
+ * @example
+ * import { StringToSymbol } from "gchain-ts-lib/src/asset";
+ */
+export function StringToSymbol(precision: u8, str: string): u64 {
+    // CAUTION(fanliangqin): str.length must be less than 7
+    let len: u8 = <u8>str.length;
+    gchain_assert(len <= 7, "length of _symbol name must be less than 7.");
+    let result: u64 = 0;
+    for (let i: u8 = 0; i < len; ++i) {
+        let charCode: u8 = <u8>(str.charCodeAt(i) & 0xff);
+        if (charCode < CHAR_A || charCode > CHAR_Z) {
+            Log.s("string_to__symbol failed for not supoort code : ").i(charCode, 16).flush();
+        } else {
+            result |= ((<u64>charCode) << ((8 * (i + 1))));
+        }
+    }
+
+    result |= <u64>precision;
+    return result;
+}
+/**
+ * retrieve symbol name length.
+ * @param symbolName encoded symbol name.
+ *
+ * @returns uint32
+ *
+ * @function SymbolNameLength
+ */
+function SymbolNameLength(symbolName: u64): u32 {
+    symbolName >>= 8; // skip precision
+    let length: u32 = 0;
+    while ((symbolName & 0xff) != 0 && length <= 7) {
+        ++length;
+        symbolName >>= 8;
+    }
+
+    return length;
+}
+
+/**
+ * Gchain block system Token, it's precision is 4, and symbol is "UGAS".
+ *
+ * @example
+ * import { SYS } from "gchain-ts-lib/src/asset";
+ */
+export let SYS: u64 = StringToSymbol(4, "UGAS");
+/**
+ * Gchain block system Token name "UGAS".
+ *
+ * @example
+ * import { SYS_NAME } from "gchain-ts-lib/src/asset";
+ */
+export let SYS_NAME: u64 = <u64>(SYS >> 8);
+
+/**
+ * max amount of Asset, which is 2^62 - 1.
+ */
+const MAX_AMOUNT: u64 = ((1 << 62) - 1);
+/**
+ * The class Asset manages the digital assets which stored on the chain.
+ * A valid asset has two parts: amount and symbol. Different assets have
+ * different symbols. for example, "1000 UGS" and "1000 SYS" are both valid
+ * assets, but they are different.
+ * You can do +,-,*, / and logic compare such as ==,!=, <=, >= on assets with same symbol.
+ *
+ * @class Asset
+ *
+ * @example
+ * import { Asset } from "gchain-ts-lib/src/asset";
+ */
+export class Asset implements Serializable, Returnable {
+
+    private _amount: u64;
+    private _symbol: u64;
+
+    constructor(amt: u64 = 0, sy: u64 = 0x5341475504) { // 0x5341475504 means "StingToSymbol(4, UGAS)"
+        this._amount = amt;
+        this._symbol = sy;
+    }
+
+    deserialize(ds: DataStream): void {
+        this._amount = ds.read<u64>();
+        this._symbol = ds.read<u64>();
+    }
+
+    serialize(ds: DataStream): void {
+        ds.write<u64>(this._amount);
+        ds.write<u64>(this._symbol);
+    }
+
+    primaryKey(): u64 {
+        return this._symbol;
+    }
+    /**
+     * To check if a symbol is valid or not.
+     * A valid symbol must fullfill two conditions:
+     * 1. length of symbol string must be less or equal than 7.
+     *    for example, "ABCDEFG" is valid, but "ABCEDFGH" is invalid.
+     * 2. the symbol can only contains upper case characters in "A-Z".
+     */
+    isSymbolValid(): boolean {
+        let sym = this._symbol;
+        sym >>= 8; // remove precious bits
+        for (let i: i32 = 0; i < 7; ++i) {
+            let c: u8 = <u8>(sym & 0xff);
+            if (c < CHAR_A || c > CHAR_Z) return false;
+            sym >>= 8;
+            if ((sym & 0xff) == 0) {
+                do {
+                    sym >>= 8;
+                    if ((sym & 0xff) != 0) return false;
+                    ++i;
+                } while (i < 7);
+            }
+        }
+        return true;
+    }
+
+    private static checkOperatorCondition(rhs: Asset, lhs: Asset, op: string): void {
+        // Log.s("checkOperator: ").i(rhs._symbol, 16).s("  ").i(lhs._symbol, 16).flush();
+        gchain_assert(rhs._symbol == lhs._symbol, "can not compare Asset with different symbol.");
+    }
+
+    public get amount(): u64 {
+        return this._amount;
+    }
+
+    public set amount(a: u64) {
+        this.setAmount(a);
+    }
+
+    gt(lhs: Asset): boolean {
+        return this._symbol == lhs._symbol && this._amount > lhs._amount;
+    }
+
+    gte(lhs: Asset): boolean {
+        return this._symbol == lhs._symbol && this._amount >= lhs._amount;
+    }
+
+    lt(lhs: Asset): boolean {
+        return this._symbol == lhs._symbol && this._amount < lhs._amount;
+    }
+
+    lte(lhs: Asset): boolean {
+        return this._symbol == lhs._symbol && this._amount <= lhs._amount;
+    }
+
+    eq(lhs: Asset): boolean {
+        return this._symbol == lhs._symbol && this._amount == lhs._amount;
+    }
+
+    /**
+     * Clone an Asset object.
+     */
+    clone(): Asset {
+        let ast = new Asset();
+        ast._amount = this._amount;
+        ast._symbol = this._symbol;
+
+        return ast;
+    }
+    /**
+     * add two Asset objects together, like "+"
+     * @param rhs another Asset object with same symbol.
+     */
+    add(rhs: Asset): Asset {
+        gchain_assert(rhs._symbol == this._symbol, "add: can not compare Asset with different _symbol.");
+        this._amount += rhs._amount;
+        return this;
+    }
+    /**
+     * sub Asset's amount, like "-"
+     * @param rhs another Asset object with same symbol to sub.
+     */
+    sub(rhs: Asset): Asset {
+        gchain_assert(rhs._symbol == this._symbol, "sub: can not compare Asset with different _symbol.");
+        gchain_assert(this._amount >= rhs._amount, "sub: the amount is less than target asset.");
+        this._amount -= rhs._amount;
+        return this;
+    }
+    /**
+     * multiple the asset with a factor.
+     * @param rhs multiple factor.
+     */
+    multi(rhs: u64): Asset {
+        this._amount *= rhs;
+        return this;
+    }
+    /**
+     * divide the asset with a factor.
+     * @param rhs divide factor.
+     */
+    divide(rhs: u64): Asset {
+        gchain_assert(rhs != 0, "divide by 0");
+        this._amount /= rhs;
+        return this;
+    }
+    /**
+     * Get the amount of Asset.
+     * @returns an uint64 value.
+     */
+    getAmount(): u64 { return this._amount; }
+    /**
+     * Set the amount of Asset.
+     * @param newAmount new amount value.
+     */
+    setAmount(newAmount: u64): void {
+        if (this.isAmountWithinRange(newAmount)) {
+            this._amount = newAmount;
+        }
+    }
+    /**
+     * Get the encoded symbol.
+     * for example, if the symbol string is "ABC",
+     * then the symbol is 0x434241xx. Notice the last "xx" stands for the precisions.
+     */
+    getSymbol(): u64 { return this._symbol; }
+    /**
+     * Set new encoded symbol.
+     * Generate new symbol by calling function {@link StringToSymbol}
+     * @param newSymbol new symbol
+     */
+    setSymbol(newSymbol: u64): void { this._symbol = newSymbol; }
+    /**
+     * Get the precision of Asset.
+     */
+    symbolPrecision(): u64 { return this._symbol & 0xff; }
+    /**
+     * Get symbol name without precision info.
+     */
+    symbolName(): u64 { return this._symbol >> 8; }
+    /**
+     * Get the length of symbol name.
+     * @returns uint32
+     */
+    symbolNameLength(): u32 { return SymbolNameLength(this._symbol); }
+    /**
+     * to check if the amount of Asset is valid or not.
+     * @param amount new amount of Asset, which muse be positive and less than 2^62 - 1
+     */
+    isAmountWithinRange(amount: u64): boolean {
+        return 0 <= amount && amount <= MAX_AMOUNT;
+    }
+    /**
+     * To check if an Asset is valid or not.
+     */
+    isValid(): boolean {
+        return this.isAmountWithinRange(this._amount) && this.isSymbolValid();
+    }
+
+    prints(tag: string): void {
+        Log.s(tag).s(" [ Asset:  _amount = ").i(this._amount, 10).s(" _symbol = ").i(this._symbol, 16).s(" ]").flush();
+    }
+
+    /**
+     * Format the amount, example
+     * formatAmount(10000, 4) == "1.0000"
+     * @param amount the amount
+     * @param precision the precision
+     */
+    private formatAmount(amount: u64, precision: u8): string {
+        var digit: u64 = <u64>Math.pow(10, <i32>precision);
+        var integer: u64 = amount / digit;
+        var amountstr = itoa64(integer);
+
+        if (precision != 0) {
+            var decimal: string = itoa64(amount % digit);
+            if (decimal.length != <i32>precision) {
+                let zero = "0";
+                return amountstr.concat(".").concat(zero.repeat(precision - decimal.length)).concat(decimal);
+            } else {
+            return amountstr.concat(".").concat(decimal);
+          }
+        }
+        return amountstr;
+    }
+
+    toString(): string {
+        var _symbol = this._symbol;
+        var precision: u8 = <u8>(_symbol & 0xFF);
+        var symbol: string = "";
+        var charCode: u8 = 0;
+        for (let i = 0; i < 7; i++) {
+            _symbol =  _symbol >> 8;
+            charCode = <u8>(_symbol & 0xFF);
+            if (charCode >= CHAR_A && charCode <= CHAR_Z) {
+                symbol = symbol.concat(String.fromCharCode(<i32>charCode));
+            }
+        }
+        return this.formatAmount(this.amount, precision).concat(" ").concat(symbol);
+    }
+
+    /**
+     * query the balance of specific account.
+     * @param account account name for querying balance from.
+     */
+    public static balanceOf(account: account_name): Asset {
+        let ret = queryBalance(account);
+        return ret;
+    }
+    /**
+     * Transfer some Assets from an account to another.
+     * It is an async method, if the operation failed, then
+     * an exception will be thrown and the transaction failed.
+     *
+     * @param from transfer Asset from this account.
+     * @param to transfer Asset to this account.
+     * @param value assets will be transfered.
+     * @param memo a memo tip for this transaction.
+     */
+    public static transfer(from: account_name, to: account_name, value: Asset, memo: string): void {
+        let pl: PermissionLevel = new PermissionLevel();
+        pl.actor = from;
+        pl.permission = "active";
+        let params = new TransferParams(from, to, value, memo);
+        let code = "transfer";
+        Action.sendInline([pl], "utrio.token", code, params);
+    }
+}

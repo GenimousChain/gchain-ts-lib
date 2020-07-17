@@ -1,0 +1,589 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>gchain-ts-lib</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.js" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">gchain-ts-lib</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="globals.html">Globals</a>
+				</li>
+			</ul>
+			<h1> gchain-ts-lib</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<h1 id="manual-for-coding-contract-on-gchain-blockchain">Manual for coding contract on Gchain Blockchain</h1>
+				<hr>
+				<h1 id="startup">Startup</h1>
+				<p>Gchain Blockchain uses a language likes Javascript to write smart contracts, this language bases on Typescript with strong type checking, so you can interpret it as C++ or Java.</p>
+				<h2 id="predefined-functions">Predefined functions</h2>
+				<p>function NAME(str: string): u64
+				: This funciton is applied to convert a string to account_name. The length of <code>str</code> must be equal-less than 12 and it can only contain characters from  <code>.012345abcdefghijklmnopqrstuvwxyz</code>, also, <code>str</code> can not end with <code>.</code>, otherwise it will be trimed.</p>
+				<p>function RNAME(account: account_name): string
+				:  This funciton is applied to convert an account_name to string.</p>
+				<p>function ACTION(str: string): Action
+				:  This funciton is applied to convert a string to class Action. Action wraps action related operations. The <code>str</code> only contains characters from  <code>._0-9a-zA-Z</code>, and its length must be less than 22. Refer class Action for more details.</p>
+				<p>Action.sender
+				:  The originator of current transaction, it returns an account_name value.</p>
+				<p>Action.receiver
+				:  The receiver of current transaction, normally, it is the account of your smart contract deployed to.</p>
+				<p>Block.number
+				:  The height of head block.</p>
+				<p>Block.id
+				:  The id of head block, it is a hexadecimal string with sha256 encryted .</p>
+				<p>Block.timestamp
+				:  The timestamp of head block, it returns seconds count since epoch.</p>
+				<h2 id="your-first-hello-world-contract">Your first Hello world contract</h2>
+				<pre><code><span class="hljs-keyword">import</span> { <span class="hljs-type">NAME</span>, <span class="hljs-type">RNAME</span> } from <span class="hljs-string">"gchain-ts-lib/src/account"</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-type">Log</span> } from <span class="hljs-string">"gchain-ts-lib/src/log"</span>;
+<span class="hljs-keyword">import</span> { <span class="hljs-type">Contract</span> } from <span class="hljs-string">"gchain-ts-lib/src/contract"</span>;
+
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">HelloWorld</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Contract</span> </span>{
+
+    <span class="hljs-meta">@action</span>
+    hi(name: account_name, age: u32, msg: string): void {
+        <span class="hljs-type">Log</span>.s(<span class="hljs-string">"hi: name = "</span>).s(<span class="hljs-type">RNAME</span>(name)).s(<span class="hljs-string">" age = "</span>).i(age, <span class="hljs-number">10</span>).s(<span class="hljs-string">" msg = "</span>).s(msg).flush();
+    }
+}</code></pre><p>Let&#39;s explain this snippet:</p>
+				<ol>
+					<li><code>import</code>: You can import classes, funcitons or anyother symbols exported from other files. You can refer to <a href="https://www.tutorialspoint.com/typescript/index.htm">typescript</a> for more details.</li>
+					<li><code>extends Contract</code>: Each smart contract must extends from base class Contract, and there must be ONE and ONLY ONE class extends from Contract.</li>
+					<li><code>@action</code>: To declare an aciton. If a function is labeled with @action, then it can be invoked by sending a transaction to it.</li>
+					<li><code>Log</code>: Prints log to console.</li>
+				</ol>
+				<h2 id="compile-and-deploy-a-smart-contract">Compile and deploy a smart contract</h2>
+				<ul>
+					<li>To compile a contract, use:
+					<code>gkit build</code></li>
+				</ul>
+				<ul>
+					<li>To deploy a contract, use:
+					<code>gkit deploy</code></li>
+				</ul>
+				<h2 id="return-message-from-an-transaction">Return message from an transaction</h2>
+				<p>In order to pass messages between blockchain node and centralized server, we import method <em>Return</em> and <em>ReturnArray</em>. The returned message will be appened to the http response.
+					Please notice this fact: <strong>Return message is only a pre executed result of one blockchain node, it is not confirmed by the blockchain network. Sometimes the confirmed message would be different with what your get from http response.</strong>
+				To return a message, please call <code>Return</code>,<code>ReturnArray</code> methods like this example:</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">class</span> HelloContract <span class="hljs-keyword">extends</span> Contract {
+    <span class="hljs-meta">@action</span>
+    on_hi(name: u64, age: u32, msg: <span class="hljs-built_in">string</span>): <span class="hljs-built_in">void</span> {
+        Return&lt;<span class="hljs-built_in">string</span>&gt;(<span class="hljs-string">"call hi() succeed."</span>);
+        ReturnArray&lt;u8&gt;([<span class="hljs-number">1</span>,<span class="hljs-number">2</span>,<span class="hljs-number">3</span>]);
+    }
+}</code></pre>
+				<p>After the action pre executed, you will get <code>call hi() succeed.123</code> as return message.</p>
+				<blockquote>
+					<p>NOTICE for Return a message</p>
+					<ol>
+						<li>Length of return message is limited, its default length is 128( The integer values will be converted to string). You can change the default value <code>contract-return-string-length = 512</code> from file config.ini.</li>
+						<li>Return, ReturnArray only support primitive types, include integer, string, array of integer, array of string.</li>
+						<li>You can call Return or ReturnArray multi times, the message will be concated.</li>
+						<li>If the length of return message is longer than contract-return-string-length, the message is discared silently, no exception thrown.</li>
+					</ol>
+				</blockquote>
+				<h2 id="query-and-transfer-tokens-from-utrio-token">Query and transfer tokens from utrio.token</h2>
+				<p>You can query/transfer the tokens from/to the account utrio.token, which Gchain Blockchain issues tokens to. To query tokens of an account, call method <code>Asset.balanceOf(who: account_name): Asset</code>; To transfer tokens between accounts, call method <code>Asset.transfer(from: account_name, to: account_name, val: Asset, memo: string): void</code>.</p>
+				<p>For more details, refer to demo <a href="https://github.com/GenimousChain/TsSDK/blob/master/example/balance/balance.ts">balance</a>。</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> <span class="hljs-string">"allocator/arena"</span>;
+<span class="hljs-keyword">import</span> { Contract } <span class="hljs-keyword">from</span> <span class="hljs-string">"gchain-ts-lib/src/contract"</span>;
+<span class="hljs-keyword">import</span> { Asset } <span class="hljs-keyword">from</span> <span class="hljs-string">"gchain-ts-lib/src/asset"</span>;
+<span class="hljs-keyword">import</span> { gchain_assert } <span class="hljs-keyword">from</span> <span class="hljs-string">"gchain-ts-lib/src/utils"</span>;
+
+<span class="hljs-keyword">class</span> BalanceContract <span class="hljs-keyword">extends</span> Contract {
+
+    <span class="hljs-meta">@action</span>
+    transfer(<span class="hljs-keyword">from</span>: account_name, to: account_name, bet: Asset): <span class="hljs-built_in">void</span> {
+
+        <span class="hljs-keyword">let</span> balance = Asset.balanceOf(<span class="hljs-keyword">from</span>);
+        gchain_assert(balance.gte(bet), <span class="hljs-string">"your balance is not enough."</span>);
+
+        balance.prints(<span class="hljs-string">"banalce from: "</span>);
+
+        Asset.transfer(<span class="hljs-keyword">from</span>, to, bet, <span class="hljs-string">"this is a transfer test"</span>);
+    }
+}</code></pre>
+				<blockquote>
+					<p>NOTICE
+					You must delegate your active permission to account <code>utrio.code</code>, if you want to transfer your tokens to some account from another contract.</p>
+				</blockquote>
+				<h2 id="monitor-events">Monitor Events</h2>
+				<ul>
+					<li><p>emit event from an action</p>
+						<pre><code><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">HelloWorld</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Contract</span></span>{
+
+  <span class="hljs-meta">@action</span>
+  hi(name: account_name, age: u32, msg: string): void {
+      <span class="hljs-type">Log</span>.s(<span class="hljs-string">"hi: name = "</span>).s(<span class="hljs-type">RNAME</span>(name)).s(<span class="hljs-string">" age = "</span>).i(age, <span class="hljs-number">10</span>).s(<span class="hljs-string">" msg = "</span>).s(msg).flush();
+      emit(<span class="hljs-string">"onHiInvoked"</span>, <span class="hljs-type">EventObject</span>.setString(<span class="hljs-string">"name"</span>, <span class="hljs-type">RNAME</span>(name)));
+  }</code></pre><p><strong>emit</strong>: It will emit event  &quot;onHiInvoked&quot;, and the messages set to EventObject will be composed to a JSON object.
+							The length of JSON object is limited to 128, you can config <code>contract-emit-string-length</code> in config.ini to change the default value.
+						If the length of JSON object is longer than contract-emit-string-length, this event would be discared without any exception.</p>
+					</li>
+					<li><p>Subscribe/Unsubscribe events from blockchian node
+						Clients should subscribe envents from blockchain node, when a contract emits an event, the node will post EventObject message to specific url.</p>
+					</li>
+				</ul>
+				<p>（In below snippets, the host and port of http url should be replaced with concrete values.）</p>
+				<p><strong>Subscribe</strong>
+					You can post your request via this RPC  <code>http://localhost:8888/v1/chain/register_event</code> to subscribe all events of account.
+				The data struct of your request：</p>
+				<pre><code class="language-JSON">{
+<span class="hljs-attr">"account"</span>: <span class="hljs-string">"account_which_contract_deployed_to"</span>,
+<span class="hljs-attr">"post_url"</span>: <span class="hljs-string">"http://yourserver:yourport"</span>
+}</code></pre>
+				<p>If you subscribe events by curl, here is an example:</p>
+				<pre><code class="language-base">curl -X POST -d &#39;{&quot;account&quot;:&quot;contract.he&quot;,&quot;post_url&quot;:&quot;http://127.0.0.1:3000&quot;}&#39; &quot;http://localhost:8888/v1/chain/register_event&quot;</code></pre>
+				<p><strong>Unsubscribe</strong>
+				You can post this request to unsubscribe by   <code>http://localhost:8888/v1/chain/unregister_event</code></p>
+				<p>for curl example:</p>
+				<pre><code class="language-base">curl -X POST -d &#39;{&quot;account&quot;:&quot;contract.he&quot;,&quot;post_url&quot;:&quot;http://127.0.0.1:3000&quot;}&#39; &quot;http://localhost:8888/v1/chain/unregister_event&quot;</code></pre>
+				<p><strong>Struct of Event Message</strong>
+				When some events emit, the blockchain node will post message to post_url, the message contains event name and a JSON style string.</p>
+				<h3 id="start-a-http-server-to-receive-posted-event-message">Start a http server to receive posted event message</h3>
+				<p>Now start a http server to listen incoming message:
+				<strong>IMPORTANT</strong>: the server instance should support <code>keep-alive</code> settings.</p>
+				<pre><code class="language-javascript">http = <span class="hljs-built_in">require</span>(<span class="hljs-string">'http'</span>);
+fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">'fs'</span>);
+server = http.createServer( <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params">req, res</span>) </span>{
+
+    <span class="hljs-built_in">console</span>.dir(req.param);
+
+    <span class="hljs-keyword">if</span> (req.method == <span class="hljs-string">'POST'</span>) {
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"POST"</span>);
+        <span class="hljs-keyword">var</span> body = <span class="hljs-string">''</span>;
+        req.on(<span class="hljs-string">'data'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params">data</span>) </span>{
+            body += data;
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Partial body: "</span> + body);
+        });
+        req.on(<span class="hljs-string">'end'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) </span>{
+            <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"Body: "</span> + body);
+        });
+        res.writeHead(<span class="hljs-number">200</span>, {<span class="hljs-string">'Content-Type'</span>: <span class="hljs-string">'text/html'</span>});
+        res.end(<span class="hljs-string">'post received'</span>);
+    }
+    <span class="hljs-keyword">else</span>
+    {
+        <span class="hljs-built_in">console</span>.log(<span class="hljs-string">"GET"</span>);
+
+        <span class="hljs-keyword">var</span> html = fs.readFileSync(<span class="hljs-string">'index.html'</span>);
+        res.writeHead(<span class="hljs-number">200</span>, {<span class="hljs-string">'Content-Type'</span>: <span class="hljs-string">'text/html'</span>});
+        res.end(html);
+    }
+
+});
+
+port = <span class="hljs-number">3000</span>;
+host = <span class="hljs-string">'127.0.0.1'</span>;
+server.timeout = <span class="hljs-number">0</span>;
+serfer.keepAliveTimeout = <span class="hljs-number">0</span>;
+server.listen(port, host);
+<span class="hljs-built_in">console</span>.log(<span class="hljs-string">'Listening at http://'</span> + host + <span class="hljs-string">':'</span> + port);
+</code></pre>
+				<h2 id="persistent-storage">Persistent Storage</h2>
+				<p>It is different with Ethereum, Gchain blockchain should not store data automatically, you can decide what dataes should be stored to or loaded from database.
+				You can do this by next steps:</p>
+				<h3 id="interface-i-serializable-i-">Interface <i>Serializable</i></h3>
+				<p>Serializable is an interface which defines methods to serialize and deserialize dataes, that supports persistent storage. It defines thress methods：</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">export</span> <span class="hljs-keyword">interface</span> Serializable {
+    deserialize(ds: DataStream): <span class="hljs-built_in">void</span>;
+    serialize(ds : DataStream) : <span class="hljs-built_in">void</span>;
+    primaryKey(): u64;
+}</code></pre>
+				<ul>
+					<li><code>deserialize(ds: DataStream): void;</code> To deserialize an object from a datastrem.</li>
+					<li><code>serialize(ds: DataStream): void;</code> To serialize an object to a datastream.</li>
+					<li><code>primaryKey(): u64;</code> To generate a primary key for this object. If this object will be stored to database as an independent item, the return value will be the primary key in database. Otherwise, the return value is useless.</li>
+				</ul>
+				<blockquote>
+					<p><em>NOTICE</em></p>
+					<ol>
+						<li>The compiler would implements these methods automatically and serialize/deserialize all of its member varialbes if  a class implements interface Serializeable. If you want to override one or all of three methods, the compiler would choose your implementation and should not generate theme by itself.</li>
+						<li>If some member variables should be prevent from being serialized and deserialized, label them with <code>@ignore</code>.；</li>
+						<li>If a member variable is primary key, label it with <code>@primaryid</code>. Be attentation the @primaryid member variable must be type of u64.
+						If none member varialbe is labeled with @primaryid, funciton primaryKey() return <i>0</i> as default.</li>
+						<li>If label member variables with @ignore or/and @primaryid, and override function one or all of serialize(), deserialzie() or primaryKey(), the compiler should use overrided functions priority.</li>
+					</ol>
+				</blockquote>
+				<p>Here is an example to describe how to use interface Serializalbe:</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">class</span> Person <span class="hljs-keyword">implements</span> Serializable {
+    name: <span class="hljs-built_in">string</span>;
+    age: u32;
+    sex: <span class="hljs-built_in">string</span>;
+    salary: u32;
+    <span class="hljs-meta">@ignore</span>
+    address: <span class="hljs-built_in">string</span>; <span class="hljs-comment">// be ignored</span>
+
+    <span class="hljs-keyword">constructor</span>(<span class="hljs-params"></span>) {
+        <span class="hljs-keyword">this</span>.name = <span class="hljs-string">"xx"</span>;
+        <span class="hljs-comment">//...</span>
+    }
+    <span class="hljs-comment">// override function primaryKey(), return id of class Person.</span>
+    primaryKey(): u64 {
+        <span class="hljs-keyword">return</span> NAME(<span class="hljs-keyword">this</span>.name);
+    }
+}</code></pre>
+				<h3 id="serializable-data-types">Serializable data types</h3>
+				<p>If you want to store data to database, the data must support serialize and deserialize. There are some data types can do this:</p>
+				<ol>
+					<li>Primitive data types： u8/i8, u16/i16, u32/i32, u64/i64, boolean, string.
+					Some data type like <code>account_name</code> is an alias of primitive type of u64.</li>
+					<li>Array of primitive data types： u8[], i8[], ..., string[]</li>
+					<li>Classes which implements interface Serializable, like Person.</li>
+					<li>Array of classes which implements interface Serializable, like Person[].</li>
+				</ol>
+				<h3 id="declare-table-information-for-db">Declare table information for DB</h3>
+				<p>If a contract use DB to persistent data, you must declare table information at your Contract.</p>
+				<p>Here is a snippet:</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">class</span> Person <span class="hljs-keyword">implements</span> Serializable {
+   name: <span class="hljs-built_in">string</span>;
+   sex: <span class="hljs-built_in">string</span>;
+}
+
+<span class="hljs-keyword">class</span> Car <span class="hljs-keyword">implements</span> Serializable {
+   model: <span class="hljs-built_in">string</span>;
+   power: u32;
+   color: <span class="hljs-built_in">string</span>;
+}
+
+<span class="hljs-meta">@database</span>(Person, <span class="hljs-string">"persons"</span>)
+<span class="hljs-meta">@database</span>(Car, <span class="hljs-string">"cars"</span>)
+<span class="hljs-comment">// @database() if any more</span>
+clas MyContract <span class="hljs-keyword">extends</span> Contract {
+    <span class="hljs-comment">//...</span>
+    <span class="hljs-comment">// your logic here</span>
+}</code></pre>
+				<p>The compiler will generate two tables in abi file for &quot;persons&quot; and &quot;cars&quot;.
+				Be attentation, the classes labeled with @database <strong>must implements interface Serializable</strong>.</p>
+				<h3 id="read-and-write-database">Read and Write Database</h3>
+				<p>  Gchain smart contract uses class DBManager to manipulate reading and write database.</p>
+				<h4 id="definition-of-dbmanager-">Definition of DBManager：</h4>
+				<pre><code> export <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">DBManager</span>&lt;<span class="hljs-title">T</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Serializable</span>&gt; {</span>
+    constructor(<span class="hljs-string">tblname:</span> u64, <span class="hljs-string">owner:</span> u64, <span class="hljs-string">scope:</span> u64) {}
+    <span class="hljs-keyword">public</span> cursor(): Cursor&lt;T&gt; {}
+    <span class="hljs-keyword">public</span> emplace(<span class="hljs-string">payer:</span> u64, <span class="hljs-string">obj:</span> T): <span class="hljs-keyword">void</span> {}
+    <span class="hljs-keyword">public</span> modify(<span class="hljs-string">payer:</span> u64, <span class="hljs-string">newobj:</span> T): <span class="hljs-keyword">void</span> {}
+    <span class="hljs-keyword">public</span> exists(<span class="hljs-string">primary:</span> u64): <span class="hljs-keyword">boolean</span> {}
+    <span class="hljs-keyword">public</span> get(<span class="hljs-string">primary:</span> u64, <span class="hljs-string">out:</span> T): <span class="hljs-keyword">boolean</span> { }
+    <span class="hljs-keyword">public</span> erase(<span class="hljs-string">obj:</span> T): <span class="hljs-keyword">void</span> {}
+}</code></pre><ul>
+					<li>constructor() has three parameters， <code>tblname: u64</code> means table name. <code>owner：u64</code> is always the account which this contract deployed to. <code>scope: u64</code> is a context.</li>
+					<li>cursor() retrieve table rows.</li>
+					<li>emplace() insert an item to database. <code>payer</code> will pay for the storage，<code>obj</code> is an serializable object.</li>
+					<li>modify() update an item.</li>
+					<li>exists() judges if an primary key exists in DB or not.</li>
+					<li>get() read an item from DB and deserialize it to <em>out</em> object.</li>
+					<li>erase() to eliminate an item from DB whose primary key matched.<blockquote>
+							<p>NOTICE
+							You can not drop a table manually, if all of its items eliminated, the table is dropped.</p>
+						</blockquote>
+					</li>
+				</ul>
+				<h4 id="use-cursor-to-iterate-table-rows">Use cursor to iterate table rows</h4>
+				<p>We provide a method <em>cursor()</em> to retrieve all of the table rows. But you must bear in mind that it is a very very low performance operation. It loads all the rows to memory while you invoke cursor(), so if there are too many records, your action will be stucked for a while, and it will fail your action.
+				Here is a snippet to show how to use cursor:</p>
+				<pre><code class="language-javascript"><span class="hljs-keyword">let</span> cursor = <span class="hljs-keyword">this</span>.db.cursor();
+Log.s(<span class="hljs-string">"cursor.count ="</span>).i(cursor.count).flush();
+cursor.first();
+<span class="hljs-keyword">while</span>(cursor.hasNext()) {
+    <span class="hljs-keyword">let</span> p: Person = cursor.get();
+    p.prints();
+    cursor.next();
+}</code></pre>
+				<h4 id="relationship-between-scope-and-primary-key-in-a-table">Relationship between <em>scope</em> and <em>primary key</em> in a table</h4>
+				<p>You can classify your data both with scope or primary key in a table, but they are in different dimensions, we should interpret them as below struct:</p>
+				<pre><code>
+ |<span class="hljs-params">--table</span>
+ |<span class="hljs-params">----scope1</span>
+ |<span class="hljs-params">--------primaryKey_1</span>
+ |<span class="hljs-params">--------primaryKey_2</span>
+ |<span class="hljs-params">--------</span><span class="hljs-string">........</span>
+ |<span class="hljs-params">----scope2</span>
+ |<span class="hljs-params">--------primaryKey_x</span>
+ |<span class="hljs-params">--------primaryKey_y</span>
+ |<span class="hljs-params">--------</span><span class="hljs-string">.......</span>
+</code></pre><p>With different scope, items can have the same primary keys.</p>
+				<h4 id="a-demo-of-dbmanager">A demo of DBManager</h4>
+				<p>Here is a demo for manipulate DBManager, refer to  <a href="https://github.com/GenimousChain/gchain-ts-lib/blob/master/example/person/person.ts">Person</a> for details.</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> <span class="hljs-string">"allocator/arena"</span>;
+<span class="hljs-keyword">import</span> { Contract } <span class="hljs-keyword">from</span> <span class="hljs-string">"gchain-ts-lib/src/contract"</span>;
+<span class="hljs-keyword">import</span> { Log } <span class="hljs-keyword">from</span> <span class="hljs-string">"gchain-ts-lib/src/log"</span>;
+<span class="hljs-keyword">import</span> { gchain_assert } <span class="hljs-keyword">from</span> <span class="hljs-string">"gchain-ts-lib/src/utils"</span>;
+<span class="hljs-keyword">import</span> { DBManager } <span class="hljs-keyword">from</span> <span class="hljs-string">"gchain-ts-lib/src/dbmanager"</span>;
+<span class="hljs-keyword">import</span> { NAME } <span class="hljs-keyword">from</span> <span class="hljs-string">"gchain-ts-lib/src/account"</span>;
+
+<span class="hljs-keyword">class</span> Person <span class="hljs-keyword">implements</span> Serializable {
+    <span class="hljs-comment">// name: string;</span>
+    name: <span class="hljs-built_in">string</span>
+    age: u32;
+    salary: u32;
+
+    primaryKey(): u64 { <span class="hljs-keyword">return</span> NAME(<span class="hljs-keyword">this</span>.name); }
+
+    prints(): <span class="hljs-built_in">void</span> {
+        Log.s(<span class="hljs-string">"name = "</span>).s(<span class="hljs-keyword">this</span>.name).s(<span class="hljs-string">", age = "</span>).i(<span class="hljs-keyword">this</span>.age).s(<span class="hljs-string">", salary = "</span>).i(<span class="hljs-keyword">this</span>.salary).flush();
+    }
+}
+
+<span class="hljs-keyword">const</span> tblname = <span class="hljs-string">"humans"</span>;
+<span class="hljs-keyword">const</span> scope = <span class="hljs-string">"dept.sales"</span>;
+
+<span class="hljs-meta">@database</span>(Person, <span class="hljs-string">"humans"</span>)
+<span class="hljs-comment">// @database(SomeMoreRecordStruct, "other_table")</span>
+<span class="hljs-keyword">class</span> PersonContract <span class="hljs-keyword">extends</span> Contract {
+
+    db: DBManager&lt;Person&gt;;
+
+    <span class="hljs-keyword">public</span> onInit(): <span class="hljs-built_in">void</span> {
+        <span class="hljs-keyword">this</span>.db = <span class="hljs-keyword">new</span> DBManager&lt;Person&gt;(NAME(tblname), <span class="hljs-keyword">this</span>.receiver, NAME(scope));
+    }
+
+
+    <span class="hljs-keyword">public</span> onStop(): <span class="hljs-built_in">void</span> {
+
+    }
+
+    <span class="hljs-keyword">constructor</span>(<span class="hljs-params">code: u64</span>) {
+        <span class="hljs-keyword">super</span>(code);
+        <span class="hljs-keyword">this</span>._receiver = code;
+
+        <span class="hljs-keyword">this</span>.onInit();
+    }
+
+    <span class="hljs-meta">@action</span>
+    add(name: <span class="hljs-built_in">string</span>, age: u32, salary: u32): <span class="hljs-built_in">void</span> {
+        <span class="hljs-keyword">let</span> p = <span class="hljs-keyword">new</span> Person();
+        p.name = name;
+        p.age = age;
+        p.salary = salary;
+
+        <span class="hljs-keyword">let</span> existing = <span class="hljs-keyword">this</span>.db.exists(NAME(name));
+        gchain_assert(!existing, <span class="hljs-string">"this person has existed in db yet."</span>);
+        p.prints();
+        <span class="hljs-keyword">this</span>.db.emplace(<span class="hljs-keyword">this</span>.receiver, p);
+    }
+
+    <span class="hljs-meta">@action</span>
+    modify(name: <span class="hljs-built_in">string</span>, salary: u32): <span class="hljs-built_in">void</span> {
+        <span class="hljs-keyword">let</span> p = <span class="hljs-keyword">new</span> Person();
+        <span class="hljs-keyword">let</span> existing = <span class="hljs-keyword">this</span>.db.get(NAME(name), p);
+        gchain_assert(existing, <span class="hljs-string">"the person does not exist."</span>);
+
+        p.salary = salary;
+
+        <span class="hljs-keyword">this</span>.db.modify(<span class="hljs-keyword">this</span>.receiver, p);
+    }
+
+    <span class="hljs-meta">@action</span>
+    remove(name: <span class="hljs-built_in">string</span>): <span class="hljs-built_in">void</span> {
+        Log.s(<span class="hljs-string">"start to remove: "</span>).s(name).flush();
+        <span class="hljs-keyword">this</span>.db.erase(NAME(name));
+    }
+}</code></pre>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="globals.html"><em>Globals</em></a>
+					</li>
+					<li class="label tsd-is-external">
+						<span>Internals</span>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_src_account_.html">"src/account"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_src_action_.html">"src/action"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_src_asset_.html">"src/asset"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_src_big_number_.html">"src/big_<wbr>number"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_src_block_.html">"src/block"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_src_contract_.html">"src/contract"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_src_crypto_.html">"src/crypto"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_src_dbmanager_.html">"src/dbmanager"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_src_events_.html">"src/events"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_src_log_.html">"src/log"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_src_permission_level_.html">"src/permission-<wbr>level"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_src_return_.html">"src/return"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_src_safemath_.html">"src/safemath"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_src_time_.html">"src/time"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_src_transaction_.html">"src/transaction"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_src_utils_.html">"src/utils"</a>
+					</li>
+					<li class="label tsd-is-external">
+						<span>Externals</span>
+					</li>
+					<li class=" tsd-kind-external-module tsd-is-external">
+						<a href="modules/_lib_arraymap_.html">"lib/arraymap"</a>
+					</li>
+					<li class=" tsd-kind-external-module tsd-is-external">
+						<a href="modules/_lib_balance_.html">"lib/balance"</a>
+					</li>
+					<li class=" tsd-kind-external-module tsd-is-external">
+						<a href="modules/_lib_headblock_.html">"lib/headblock"</a>
+					</li>
+					<li class=" tsd-kind-external-module tsd-is-external">
+						<a href="modules/_lib_map_.html">"lib/map"</a>
+					</li>
+					<li class=" tsd-kind-external-module tsd-is-external">
+						<a href="modules/_lib_name_.html">"lib/name"</a>
+					</li>
+					<li class=" tsd-kind-external-module tsd-is-external">
+						<a href="modules/_lib_name_ex_.html">"lib/name_<wbr>ex"</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-module"><span class="tsd-kind-icon">Module</span></li>
+				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+				<li class="tsd-kind-enum-member"><span class="tsd-kind-icon">Enumeration member</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-enum"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-enum"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-interface"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-interface"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-class"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
+				<li class="tsd-kind-call-signature tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="http://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="assets/js/search.js"><' + '/script>');</script>
+</body>
+</html>

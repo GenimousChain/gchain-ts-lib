@@ -1,0 +1,56 @@
+/**
+ * @author gchain
+ * @datetime 16:36:37, 07/05/2018
+ * All rights reserved by gchain
+ */
+import { string2cstr } from "./utils";
+
+namespace env {
+    export declare function set_result_str(cstr: ArrayBuffer): void;
+    export declare function set_result_int(val: u64): void;
+}
+/**
+ * set value as return value. This value will be printed to console or return within response
+ * if you call API by POST method via https. Till now, type T can only be string or integer.
+ * NOTE: the return value doesn't mean the transaction is commited by blockchain, but means if the
+ * transaction is executed, the result will be it.
+ * @param val value will set as return value.
+ *
+ * @example
+ * import { Return } from "gchain-ts-lib/src/return";
+ */
+export function Return<T> (val: T): void {
+    if (isString(val)) {
+        env.set_result_str(string2cstr(val));
+    } else if (isInteger(val)) {
+        env.set_result_int(<u64>val);
+    } else {
+        returnObj(val);
+        // gchain_assert(false, "Return only support string and int.");
+    }
+}
+
+function returnObj<T extends Returnable>(val: T): void {
+    env.set_result_str(string2cstr(val.toString()));
+}
+
+/**
+ * return an array to caller. It behaves like Return.
+ * @param val an array of returns value.
+ *
+ * @example
+ * import { ReturnArray } from "gchain-ts-lib/src/return";
+ */
+export function ReturnArray<T>(val: T[]): void {
+    var lfBracket: string = "[";
+    var rtBracket: string = "]";
+    var comma: string = ",";
+    env.set_result_str(string2cstr(lfBracket));
+    for (let i: i32 = 0; i < val.length; i++) {
+        if (i != 0) {
+            env.set_result_str(string2cstr(comma));
+        }
+        Return<T>(val[i]);
+    }
+    env.set_result_str(string2cstr(rtBracket));
+}
