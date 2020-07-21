@@ -112,7 +112,7 @@ export class Account {
     }
 
     /**
-     * get the balance of this account, the balance is issued by utrio.token.
+     * get the balance of this account, the balance is issued by gcfio.token.
      */
     public get balance(): Asset {
         return queryBalance(this.code);

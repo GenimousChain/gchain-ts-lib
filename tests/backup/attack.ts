@@ -12,7 +12,7 @@ class Attack extends Contract {
         Log.s("memo: ").s(memo).flush();
         let pl = new PermissionLevel(this.receiver, "active");
         let params = new TransferParams(from, to, money, memo);
-        Action.sendInline([pl], "utrio.token", "transfer", params);
+        Action.sendInline([pl], "gcfio.token", "transfer", params);
 
         // Asset.transfer(from, to, money, memo);
     }

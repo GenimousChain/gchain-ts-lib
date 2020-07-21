@@ -344,6 +344,6 @@ export class Asset implements Serializable, Returnable {
         pl.permission = "active";
         let params = new TransferParams(from, to, value, memo);
         let code = "transfer";
-        Action.sendInline([pl], "utrio.token", code, params);
+        Action.sendInline([pl], "gcfio.token", code, params);
     }
 }

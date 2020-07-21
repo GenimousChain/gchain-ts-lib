@@ -72,7 +72,7 @@ export class CurrencyStats implements Serializable {
  * @function queryBalance
  */
 export function queryBalance(owner: account_name): Asset {
-    let accounts: DBManager<CurrencyAccount> = DBManager.newInstance<CurrencyAccount>(NAME("accounts"), NAME("utrio.token"), owner);
+    let accounts: DBManager<CurrencyAccount> = DBManager.newInstance<CurrencyAccount>(NAME("accounts"), NAME("gcfio.token"), owner);
     let act: CurrencyAccount = new CurrencyAccount(new Asset());
     let existing = accounts.get(SYS_NAME, act);
     return existing ? act.balance : new Asset(0, SYS);

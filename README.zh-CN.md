@@ -122,9 +122,9 @@ class BalanceContract extends Contract {
 }
 ```
 > NOTICE
-使用Asset.transfer命令转移资产时，需要保证`from`的权限已经授权给了`utrio.code`，在使用命令行的情况下，可以通过以下命令来授权:
+使用Asset.transfer命令转移资产时，需要保证`from`的权限已经授权给了`gcfio.code`，在使用命令行的情况下，可以通过以下命令来授权:
 `clutrain set account permission $from active '{"threshold": 1, "keys":[{"key":"$PubKey_of_from", "wieght": 1}],  
-"accounts": [{"permission": {"actor": "$from", "permission": "utrio.code"}, "weight": 1]}' owner -p $from`  
+"accounts": [{"permission": {"actor": "$from", "permission": "gcfio.code"}, "weight": 1]}' owner -p $from`  
 `$from`是需要授权的帐号。
 
 

@@ -80,8 +80,8 @@ After the action pre executed, you will get `call hi() succeed.123` as return me
 3. You can call Return or ReturnArray multi times, the message will be concated.
 4. If the length of return message is longer than contract-return-string-length, the message is discared silently, no exception thrown.
 
-## Query and transfer tokens from utrio.token
-You can query/transfer the tokens from/to the account utrio.token, which Gchain Blockchain issues tokens to. To query tokens of an account, call method `Asset.balanceOf(who: account_name): Asset`; To transfer tokens between accounts, call method `Asset.transfer(from: account_name, to: account_name, val: Asset, memo: string): void`.
+## Query and transfer tokens from gcfio.token
+You can query/transfer the tokens from/to the account gcfio.token, which Gchain Blockchain issues tokens to. To query tokens of an account, call method `Asset.balanceOf(who: account_name): Asset`; To transfer tokens between accounts, call method `Asset.transfer(from: account_name, to: account_name, val: Asset, memo: string): void`.
 
 For more details, refer to demo [balance](https://github.com/GenimousChain/TsSDK/blob/master/example/balance/balance.ts)。
 ```typescript
@@ -104,7 +104,7 @@ class BalanceContract extends Contract {
 }
 ```
 > NOTICE
-> You must delegate your active permission to account `utrio.code`, if you want to transfer your tokens to some account from another contract.
+> You must delegate your active permission to account `gcfio.code`, if you want to transfer your tokens to some account from another contract.
 
 
 ## Monitor Events

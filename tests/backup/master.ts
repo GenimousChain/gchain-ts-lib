@@ -34,7 +34,7 @@ class MasterContract extends Contract {
         this.db.emplace(gamer);
     }
 
-    // 接收utrio.token的transfer信息，无论自己是作为from还是to。
+    // 接收gcfio.token的transfer信息，无论自己是作为from还是to。
     @action
     printstr(memo:string): void {
         Log.s("memo").s(memo).flush();
@@ -84,11 +84,11 @@ class MasterContract extends Contract {
         Asset.transfer(this.receiver, gamer.account, new Asset(100000), "Congratulation! you win this game!");
     }
 
-    // 过滤action接收原则，接收utrio.token的transfer事件, 如果不提供这个filter，将不能收到utrio.token的转帐通知
+    // 过滤action接收原则，接收gcfio.token的transfer事件, 如果不提供这个filter，将不能收到gcfio.token的转帐通知
     public filterAction(originalReceiver: u64): boolean {
         // 本合约的transfer方法不接受直接调用，也不接受inline方式的调用。
-        // 但是接受utrio.token的transfer方法
-        return (originalReceiver == this.receiver && this.action != NEX("transfer")) || (originalReceiver == NAME("utrio.token") && this.action == NEX("transfer"));
+        // 但是接受gcfio.token的transfer方法
+        return (originalReceiver == this.receiver && this.action != NEX("transfer")) || (originalReceiver == NAME("gcfio.token") && this.action == NEX("transfer"));
 
         // 可以使用系统默认的filter代替上面的判断。
         // return Contract.filterAcceptTransferTokenAction(this.receiver, originalReceiver, this.action);

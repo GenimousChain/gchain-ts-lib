@@ -66,7 +66,7 @@ const StatsTable  : string = "stat";
 const AccountTable: string = "accounts";
 const FrozenTable : string = "frozen.tbl";
 
-let FrezonAccount = NAME("utrio.freeze");
+let FrezonAccount = NAME("gcfio.freeze");
 
 @database(CurrencyStats, StatsTable)
 @database(CurrencyAccount, AccountTable)
@@ -129,7 +129,7 @@ export class TimeLockUIP06 extends Contract implements UIP06{
 
     @action
     public transfer(from: account_name, to: account_name, quantity: Asset, memo: string): void {
-        gchain_assert(from != FrezonAccount, "token.transfer: can not transfer from account utrio.freeze.");
+        gchain_assert(from != FrezonAccount, "token.transfer: can not transfer from account gcfio.freeze.");
         gchain_assert(from != to, "token.transfer: cannot transfer to self.");
         Action.requireAuth(from);
         gchain_assert(Account.isValid(to), "token.transfer: to account does not exist.");
@@ -153,7 +153,7 @@ export class TimeLockUIP06 extends Contract implements UIP06{
     }
 
     /**
-     * freeze some token, it will transfer token from Action.sender to 'utrio.freeze' account,
+     * freeze some token, it will transfer token from Action.sender to 'gcfio.freeze' account,
      * 'to' account can retrieval this token after deadline.
      * You can retrieval a whole frozen token at a time.
      *

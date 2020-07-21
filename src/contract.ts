@@ -91,7 +91,7 @@ export class Contract {
     public onError(): void {}
 
     /**
-     * This a safe filter for your contract if you accept the recepient from utrio.token while someone transfer UGAS to you.
+     * This a safe filter for your contract if you accept the recepient from gcfio.token while someone transfer UGAS to you.
      * It will reject the fake UGAS attack, fake transfer notification and reject calling your "transfer" action directly
      *
      * @static
@@ -102,6 +102,6 @@ export class Contract {
      * @memberof Contract
      */
     public static filterAcceptTransferTokenAction(receiver: u64, originalReceiver: u64, action: NameEx): boolean {
-        return (originalReceiver == receiver && action != NEX("transfer")) || (originalReceiver == NAME("utrio.token") && action == NEX("transfer"));
+        return (originalReceiver == receiver && action != NEX("transfer")) || (originalReceiver == NAME("gcfio.token") && action == NEX("transfer"));
     }
 }
