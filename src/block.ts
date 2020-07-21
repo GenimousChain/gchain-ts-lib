@@ -38,7 +38,7 @@ export class Block {
     /**
      * Get the id of previous of head block.
      */
-    public static get previousId(): string {
+    public static get perviousId(): string {
         return HeadBlock.previousId;
     }
 }

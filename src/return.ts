@@ -1,7 +1,7 @@
 /**
  * @author gchain
  * @datetime 16:36:37, 07/05/2018
- * All rights reserved by gchain
+ * All rights reserved by gchain.io @2018
  */
 import { string2cstr } from "./utils";
 

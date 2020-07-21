@@ -32,7 +32,7 @@ const CHAR_Z: u8 = 0x5A;
  * import { StringToSymbol } from "gchain-ts-lib/src/asset";
  */
 export function StringToSymbol(precision: u8, str: string): u64 {
-    // CAUTION(fanliangqin): str.length must be less than 7
+    // str.length must be less than 7
     let len: u8 = <u8>str.length;
     gchain_assert(len <= 7, "length of _symbol name must be less than 7.");
     let result: u64 = 0;

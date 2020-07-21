@@ -56,14 +56,14 @@ export class Voter implements Serializable {
   regisBckNum: u64; // The block number of the voter registered, used to freeze the deposit for some time.
   unregisBckNum: u64; // The block number of the voter unregistered, used to freeze the deposit for some time.
   role: i32 = 0; // The user role, 1 represent main voter, 2 represent waiter voter
-  bonus: i32 = 0; //
+  bonus: i32 = 0; // 
 
   constructor() {
     this.belongBckNums = new Array<u64>(<i32>EPOCH);
     this.voteVals = new Array<u64>(<i32>EPOCH);
   }
 
-  //In case of user calculated the random privately,
+  //In case of user calculated the random privately, 
   //so user can't vote immediately after registerd.
   votable(): boolean {
     return (Block.number > this.regisBckNum + 3 && this.regisBckNum != 0);
@@ -113,7 +113,7 @@ export class RandRecord implements Serializable, Returnable {
   primaryKey(): id_type {
     return this.blockNum;
   }
-
+  
   setFields(blockNum: u64, val: u64, code: i32): void {
     this.blockNum = blockNum;
     this.val = val;
@@ -125,7 +125,7 @@ export class RandRecord implements Serializable, Returnable {
    * The code bit value explain:
    *  code 0: absolutely random that user voting the data
    *  code 1: the random number calculated by the previos data
-   *
+   * 
    * The code value format 0b111.
    * @param preRandCode The previous rand code, 7 - the previous rand is absolutely calculated
    * @param mainVoteCode The main voter voting code, 0 - using the main voter voting
@@ -139,7 +139,7 @@ export class RandRecord implements Serializable, Returnable {
     return code;
   }
 
-  // format this.val to be hex
+  // TODO format this.val to be hex
   toString(): string {
     return intToString(this.blockNum) + "," + intToString(this.val) + "," + this.code.toString();
   }
@@ -160,7 +160,7 @@ export class Random {
     this.randDB = DBManager.newInstance<RandRecord>(NAME(RAND_TABLE), NAME(CONT_NAME), NAME(RAND_TABLE));
     this.voteHstDB = DBManager.newInstance<VoteHistory>(NAME(VOTE_HST_TABLE), NAME(CONT_NAME), NAME(VOTE_HST_TABLE));
     this.configDB = DBManager.newInstance<Config>(NAME(CONFIG_TABLE), NAME(CONT_NAME), NAME(CONFIG_TABLE));
-
+    
     this.committeeDB = DBManager.newInstance<Producer>(NAME(COMMITTEE_TABLE), NAME(ADMIN_NAME), NAME(ADMIN_NAME));
   }
 
@@ -173,7 +173,7 @@ export class Random {
     var maxBckNum = Block.number;
     gchain_assert(minBckNum <= bckNum && bckNum <= maxBckNum, "Currently the block number of the rand should be between " + intToString(minBckNum) + " and " + intToString(maxBckNum));
     return this.generateRand(bckNum, false);
-  }
+  } 
 
   @inline
   private indexOf(bckNum: u64): i32 {
@@ -248,7 +248,7 @@ export class Random {
    * if not using the waiter vote, the vote value is hash(randNum)
    */
   private getWaiterVoteVal(headBckNum: u64, randNum: u64, isUpt: boolean): RandRecord {
-
+    
     var waiterseq = new Waiter();
     this.waiterDB.get(0, waiterseq);
     let waiters = waiterseq.waiters;
@@ -276,7 +276,7 @@ export class Random {
       if (headBckNum != seedBckNum) { // This round, the user don't submit the vote.
         oldRandNum = this.hash(oldRandNum);
       } else {
-        // Using the last random period waiter vote value maybe better
+        // TODO Using the last random period waiter vote value maybe better
         rand.val = waiterVote.voteVals[index];
         rand.code = 0;
         if (isUpt && this.canSendBonus()){
@@ -313,7 +313,7 @@ export class Random {
       if (headBckNum != seedBckNum) { // This round, the user don't submit the vote.
         oldRandNum = this.hash(oldRandNum);
       } else {
-        // Using the last random period waiter vote value maybe better
+        // TODO Using the last random period waiter vote value maybe better 
         waiterVote = tempWaiter;
         break;
       }
@@ -395,14 +395,14 @@ export class Random {
   /**
    * The algorithm of the random expression:
    * rand = preRand ^ mainVoterValue ^ waiterVoterValue
-   *
+   * 
    * The algorithm of the mainVoterValue expression:
    * mainVoterValue = (m1VoterValue ^ m2VoterValue ^ ... ^ mVoterValue)
    * If no main voter voted,
    * mainVoterValue = hash(preRand)
-   *
+   *  
    * The algorithm of the waiterVoterValue:
-   * 1. Sorting the waiter sequence by the register sequence
+   * 1. Sorting the waiter sequence by the register sequence 
    * 2. Getting the random value,
    *    random = mainVoterValue, the first time
    *    random = hash(random), not the first time
@@ -432,17 +432,17 @@ export class Random {
         this.saveAndClearPartRands(headBckNum, randVal, 7);
       }
       return lastRand;
-    }
+    } 
 
     var waiterVote = new RandRecord();
     for (let i = lastBckNum + 1; i <= headBckNum; i++) {
       let mainVote = this.getMainVoteVal(i, lastRand.val);
       if ( i >= lastBckNum + EPOCH) { // In this case, there is no waiter voting
-        waiterVote.setFields(i, this.hash(mainVote.val), 1);
+        waiterVote.setFields(i, this.hash(mainVote.val), 1); 
       } else {
         waiterVote = this.getWaiterVoteVal(i, mainVote.val, isUpt);
       }
-      let code = RandRecord.calcCode(lastRand.code, mainVote.code, waiterVote.code);
+      let code = RandRecord.calcCode(lastRand.code, mainVote.code, waiterVote.code); 
       let randVal = lastRand.val ^ mainVote.val ^ waiterVote.val;
       rand.setFields(i, randVal, code);
       if (isUpt) {

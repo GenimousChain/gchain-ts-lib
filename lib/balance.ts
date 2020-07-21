@@ -1,7 +1,7 @@
 /**
  * @author gchain
  * @datetime 15:46:43, 07/06/2018
- * All rights reserved by gchain
+ * All rights reserved by gchain.io @2018
  */
 
 import { Asset, SYS_NAME, SYS } from "../src/asset";

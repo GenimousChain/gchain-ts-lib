@@ -1,0 +1,6 @@
+.*
+*.wasm
+*.wast
+*.abi
+.idea/
+node_modules/

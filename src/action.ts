@@ -116,7 +116,7 @@ export class Action {
      * @returns boolean value, return true means the account is authored, otherwised false.
      */
     public static hasAuth(account:account_name): boolean {
-        return ActionAPI.has_auth(account) == 1;
+        return ActionAPI.has_auth(account);
     }
     /**
      * check the authority of a speicfic account name.

@@ -1,7 +1,7 @@
 /**
  * @author gchain
  * @datetime 10:10:38, 07/18/2018
- * All rights reserved by gchain
+ * All rights reserved by gchain.io @2018
  */
 import { PrintableChar } from "../src/utils";
 /* format index: ._0-9a-zA-Z */

@@ -2,7 +2,8 @@
   "name": "gchain-ts-lib",
   "version": "1.0.0",
   "description": "The Gchain Smart Contract common using library written in Typescript",
-  "license": "MIT",
+  "author": "GenimousChain",
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/GenimousChain/gchain-ts-lib.git"

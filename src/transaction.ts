@@ -37,8 +37,6 @@ export class TransactionHeader implements Serializable {
         this.max_cpu_usage_ms = ds.read<u8>();
         this.delay_sec = ds.readVarint32();
     }
-
-    primaryKey(): u64 { return <u64>0; }
 }
 
 export class Transaction implements Serializable {
@@ -158,6 +156,4 @@ export class OnErrorValue implements Serializable {
         ds.read<u64>(); // omit the higher 64 bit value for uint128_t.
         this.sent_trx = ds.readVector<u8>();
     }
-
-    primaryKey(): u64 { return <u64>0; }
 }

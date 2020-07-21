@@ -5,7 +5,7 @@ import { Log } from "../../src/log";
 import { ACCOUNT, NAME, Account, RNAME } from "../../src/account";
 import { UIP09 } from "../../uips/uip09";
 
-class NftAccount implements Serializable {    
+class NftAccount implements Serializable {
     balance: Asset;
     token_ids: Array<id_type>; // Current account token ids
 
@@ -15,7 +15,6 @@ class NftAccount implements Serializable {
     }
 
     primaryKey(): id_type { return this.balance.symbolName(); }
-
 }
 
 

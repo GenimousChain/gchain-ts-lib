@@ -2,7 +2,7 @@
 /**
  * @author gchain
  * @datetime 14:35:49, 07/09/2018
- * All rights reserved by gchain
+ * All rights reserved by gchain.io @2018
  */
 import { intToString } from "../src/utils";
 import { Map } from "../lib/map";

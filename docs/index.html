@@ -135,7 +135,7 @@
 				</blockquote>
 				<h2 id="query-and-transfer-tokens-from-utrio-token">Query and transfer tokens from utrio.token</h2>
 				<p>You can query/transfer the tokens from/to the account utrio.token, which Gchain Blockchain issues tokens to. To query tokens of an account, call method <code>Asset.balanceOf(who: account_name): Asset</code>; To transfer tokens between accounts, call method <code>Asset.transfer(from: account_name, to: account_name, val: Asset, memo: string): void</code>.</p>
-				<p>For more details, refer to demo <a href="https://github.com/GenimousChain/TsSDK/blob/master/example/balance/balance.ts">balance</a>。</p>
+				<p>For more details, refer to demo <a href="https://github.com/gchain-os/TsSDK/blob/master/example/balance/balance.ts">balance</a>。</p>
 				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> <span class="hljs-string">"allocator/arena"</span>;
 <span class="hljs-keyword">import</span> { Contract } <span class="hljs-keyword">from</span> <span class="hljs-string">"gchain-ts-lib/src/contract"</span>;
 <span class="hljs-keyword">import</span> { Asset } <span class="hljs-keyword">from</span> <span class="hljs-string">"gchain-ts-lib/src/asset"</span>;
@@ -355,7 +355,7 @@ cursor.first();
  |<span class="hljs-params">--------</span><span class="hljs-string">.......</span>
 </code></pre><p>With different scope, items can have the same primary keys.</p>
 				<h4 id="a-demo-of-dbmanager">A demo of DBManager</h4>
-				<p>Here is a demo for manipulate DBManager, refer to  <a href="https://github.com/GenimousChain/gchain-ts-lib/blob/master/example/person/person.ts">Person</a> for details.</p>
+				<p>Here is a demo for manipulate DBManager, refer to  <a href="https://github.com/gchain-os/gchain-ts-lib/blob/master/example/person/person.ts">Person</a> for details.</p>
 				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> <span class="hljs-string">"allocator/arena"</span>;
 <span class="hljs-keyword">import</span> { Contract } <span class="hljs-keyword">from</span> <span class="hljs-string">"gchain-ts-lib/src/contract"</span>;
 <span class="hljs-keyword">import</span> { Log } <span class="hljs-keyword">from</span> <span class="hljs-string">"gchain-ts-lib/src/log"</span>;
